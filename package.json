@@ -1,0 +1,30 @@
+{
+  "name": "air-bnc",
+  "version": "1.0.0",
+  "description": "This repository mimics the functionality of the Air BnB website.  It will connect and insert data into a database using Node-Postgres.",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "create-db": "psql -f ./db/setup_db.sql",
+    "seed": "node run seed-run.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HazelPrince3/Air-BNC.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/HazelPrince3/Air-BNC/issues"
+  },
+  "homepage": "https://github.com/HazelPrince3/Air-BNC#readme",
+  "devDependencies": {
+    "jest": "^29.7.0"
+  },
+  "dependencies": {
+    "dotenv": "^16.5.0",
+    "pg": "^8.15.6"
+  }
+}
