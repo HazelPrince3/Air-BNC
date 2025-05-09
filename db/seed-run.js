@@ -1,7 +1,7 @@
 const seed = require("./seed");
-const {propertyTypesData, usersData} = require("./data/test/");
+const {propertyTypesData, usersData, propertiesData} = require("./data/test/");
 const db = require("./connection")
 
-seed(propertyTypesData, usersData).then(() =>{
+seed(propertyTypesData, usersData, propertiesData).then(() =>{
     db.end()
 });
