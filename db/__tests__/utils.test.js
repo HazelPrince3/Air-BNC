@@ -195,3 +195,133 @@ describe("create users ref", () => {
     expect(createUsersRef(testUsers)).toEqual({"Alice Johnson": 1, "Bob Smith": 2, "Emma Davis": 3})
   })
 })
+
+describe("format properties", () => {
+  test("first element in the array should be the correct user_id value", () => {
+    const testProperties = [
+      {
+        "name": "Modern Apartment in City Center",
+        "property_type": "Apartment",
+        "location": "London, UK",
+        "price_per_night": 120.0,
+        "description": "Description of Modern Apartment in City Center.",
+        "host_name": "Alice Johnson",
+        "amenities": ["WiFi", "TV", "Kitchen"]
+      }]
+    const testUserRef = {"Alice Johnson": 1}
+
+    const testFormatProperties = formatProperties(testProperties, testUserRef)
+
+    expect(testFormatProperties[0][0]).toBe(1)
+  })
+  test("Second element in the array should be the value of the name property", () => {
+    const testProperties = [
+      {
+        "name": "Modern Apartment in City Center",
+        "property_type": "Apartment",
+        "location": "London, UK",
+        "price_per_night": 120.0,
+        "description": "Description of Modern Apartment in City Center.",
+        "host_name": "Alice Johnson",
+        "amenities": ["WiFi", "TV", "Kitchen"]
+      }]
+    const testUserRef = {"Alice Johnson": 1}
+
+    const testFormatProperties = formatProperties(testProperties, testUserRef)
+
+    expect(testFormatProperties[0][1]).toBe("Modern Apartment in City Center")
+  })
+  test("Third element in the array should be the value of the location property", () => {
+    const testProperties = [
+      {
+        "name": "Modern Apartment in City Center",
+        "property_type": "Apartment",
+        "location": "London, UK",
+        "price_per_night": 120.0,
+        "description": "Description of Modern Apartment in City Center.",
+        "host_name": "Alice Johnson",
+        "amenities": ["WiFi", "TV", "Kitchen"]
+      }]
+    const testUserRef = {"Alice Johnson": 1}
+
+    const testFormatProperties = formatProperties(testProperties, testUserRef)
+
+    expect(testFormatProperties[0][2]).toBe("London, UK")
+  })
+  test("Fourth element in the array should be the value of the property_type property", () => {
+    const testProperties = [
+      {
+        "name": "Modern Apartment in City Center",
+        "property_type": "Apartment",
+        "location": "London, UK",
+        "price_per_night": 120.0,
+        "description": "Description of Modern Apartment in City Center.",
+        "host_name": "Alice Johnson",
+        "amenities": ["WiFi", "TV", "Kitchen"]
+      }]
+    const testUserRef = {"Alice Johnson": 1}
+
+    const testFormatProperties = formatProperties(testProperties, testUserRef)
+
+    expect(testFormatProperties[0][3]).toBe("Apartment")
+  })
+  test("Fifth element in the array should be the value of the price_per_night property", () => {
+    const testProperties = [
+      {
+        "name": "Modern Apartment in City Center",
+        "property_type": "Apartment",
+        "location": "London, UK",
+        "price_per_night": 120.0,
+        "description": "Description of Modern Apartment in City Center.",
+        "host_name": "Alice Johnson",
+        "amenities": ["WiFi", "TV", "Kitchen"]
+      }]
+    const testUserRef = {"Alice Johnson": 1}
+
+    const testFormatProperties = formatProperties(testProperties, testUserRef)
+
+    expect(testFormatProperties[0][4]).toBe(120.0)
+  })
+  test("Sixth element in the array should be the value of the description property", () => {
+    const testProperties = [
+      {
+        "name": "Modern Apartment in City Center",
+        "property_type": "Apartment",
+        "location": "London, UK",
+        "price_per_night": 120.0,
+        "description": "Description of Modern Apartment in City Center.",
+        "host_name": "Alice Johnson",
+        "amenities": ["WiFi", "TV", "Kitchen"]
+      }]
+    const testUserRef = {"Alice Johnson": 1}
+
+    const testFormatProperties = formatProperties(testProperties, testUserRef)
+
+    expect(testFormatProperties[0][5]).toBe("Description of Modern Apartment in City Center.")
+  })
+  test("Should format the correct values for multiple objects in the array", () => {
+    const testProperties = [{
+      "name": "Chic Studio Near the Beach",
+      "property_type": "Studio",
+      "location": "Brighton, UK",
+      "price_per_night": 90.0,
+      "description": "Description of Chic Studio Near the Beach.",
+      "host_name": "Alice Johnson",
+      "amenities": ["WiFi"]
+    },
+    {
+      "name": "Elegant City Apartment",
+      "property_type": "Apartment",
+      "location": "Birmingham, UK",
+      "price_per_night": 110.0,
+      "description": "Description of Elegant City Apartment.",
+      "host_name": "Emma Davis",
+      "amenities": ["TV", "Kitchen", "Washer"]
+    }]
+    const testUserRef = {"Alice Johnson": 1, "Bob Smith": 2, "Emma Davis": 3}
+
+    const testFormatProperties = formatProperties(testProperties, testUserRef)
+
+    expect(testFormatProperties).toEqual([[1, "Chic Studio Near the Beach", "Brighton, UK", "Studio", 90.0, "Description of Chic Studio Near the Beach."], [3, "Elegant City Apartment", "Birmingham, UK", "Apartment", 110.0, "Description of Elegant City Apartment."]])
+  })
+})

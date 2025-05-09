@@ -51,7 +51,21 @@ function createUsersRef(users) {
     return usersRef
 }
 
-function formatProperties(){
+function formatProperties(properties, userRef){
+    const formattedProperties = []
 
+    properties.forEach((property) => {
+        const host_id = userRef[property.host_name]
+        const name = property.name
+        const location = property.location
+        const property_type = property.property_type
+        const price_per_night = property.price_per_night
+        const description = property.description
+        formattedProperties.push([host_id, name, location, property_type, price_per_night, description])
+    })
+
+    return formattedProperties
 }
+
+
 module.exports = {formatPropertyTypes:formatPropertyTypes, formatUsers:formatUsers, createUsersRef:createUsersRef, formatProperties: formatProperties};
