@@ -1,9 +1,10 @@
 const db = require("./connection");
 const format = require("pg-format")
-const {formatPropertyTypes, formatUsers} = require("./utils/utils")
+const {formatPropertyTypes, formatUsers, createUsersRef, formatProperties} = require("./utils/utils")
 
-async function seed(propertyTypesData, usersData) {
+async function seed(propertyTypesData, usersData, propertiesData) {
 
+    await db.query(`DROP TABLE IF EXISTS properties;`)
     await db.query(`DROP TABLE IF EXISTS users;`)
     await db.query(`DROP TABLE IF EXISTS property_types;`)
 
@@ -29,10 +30,23 @@ async function seed(propertyTypesData, usersData) {
         avatar VARCHAR,
         create_at TIMESTAMP DEFAULT NOW());`);
 
-    await db.query(
+    const {rows: insertedUsers} = await db.query(
         format(
-             `INSERT INTO users (first_name, surname, email, phone_number, is_host, avatar) VALUES %L`, formatUsers(usersData))
+             `INSERT INTO users (first_name, surname, email, phone_number, is_host, avatar) VALUES %L RETURNING user_id, first_name, surname`, formatUsers(usersData))
          );
+    await db.query(`CREATE TABLE properties (
+        property_id SERIAL PRIMARY KEY,
+        host_id INT NOT NULL REFERENCES users(user_id),
+        name VARCHAR NOT NULL, 
+        location VARCHAR NOT NULL,
+        property_type VARCHAR NOT NULL REFERENCES property_types(property_type),
+        price_per_night DECIMAL NOT NULL,
+        description TEXT
+        )`)
+    const usersRef = createUsersRef(insertedUsers);
+
+     await db.query(format(`INSERT INTO properties(host_id, name, location, property_type, price_per_night, description) VALUES %L`, formatProperties(propertiesData, usersRef))
+    );
 }
 
 module.exports = seed;
