@@ -1,4 +1,4 @@
-const {formatPropertyTypes, formatUsers} = require("../utils/utils");
+const {formatPropertyTypes, formatUsers, createUsersRef, formatProperties} = require("../utils/utils");
 
 describe("format property types", () => {
     test("Should return an array", () => {
@@ -159,5 +159,39 @@ describe("format users", () => {
         "avatar": "https://example.com/images/bob.jpg"
       }]
     expect(formatUsers(testUsers)).toEqual([["Alice", "Johnson", "alice@example.com", "+44 7000 111111", true, "https://example.com/images/alice.jpg"], ["Bob", "Smith", "bob@example.com", "+44 7000 222222", false, "https://example.com/images/bob.jpg"]])
+  })
+})
+
+describe("create users ref", () => {
+  test("Should return an object", () => {
+    const testUsers = createUsersRef([])
+    expect(typeof  testUsers === "object").toBe(true)
+  })
+  test("Key on reference object should be first_name and surname", () => {
+    const testUsers = [
+      {
+        user_id: 1,
+        first_name: 'Alice',
+        surname: 'Johnson',
+      }]
+    const testFormatUsers = createUsersRef(testUsers)
+    expect((testFormatUsers.hasOwnProperty("Alice Johnson"))).toBe(true)
+  })
+  test("value on reference object should be the value of user_id property", () => {
+    const testUsers = [
+      {
+        user_id: 1,
+        first_name: 'Alice',
+        surname: 'Johnson',
+      }]
+    const testFormatUsers = createUsersRef(testUsers)
+    expect((testFormatUsers["Alice Johnson"])).toBe(1)
+  })
+  test("Should create key value pairs for multiple objects", () => {
+    const testUsers = [
+      { user_id: 1, first_name: 'Alice', surname: 'Johnson' },
+      { user_id: 2, first_name: 'Bob', surname: 'Smith' },
+      { user_id: 3, first_name: 'Emma', surname: 'Davis' }]
+    expect(createUsersRef(testUsers)).toEqual({"Alice Johnson": 1, "Bob Smith": 2, "Emma Davis": 3})
   })
 })

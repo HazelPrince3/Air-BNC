@@ -12,10 +12,10 @@ function formatPropertyTypes(propertyTypesData) {
     return formattedPropertyTypes 
 }
 
-function formatUsers(users) {
+function formatUsers(usersData) {
     const formattedUsers = []
 
-    users.forEach((user) => {
+    usersData.forEach((user) => {
         const first_name = user.first_name;
 
         const surname = user.surname;
@@ -38,4 +38,20 @@ function formatUsers(users) {
 
     return formattedUsers
 }
-module.exports = {formatPropertyTypes:formatPropertyTypes, formatUsers:formatUsers};
+
+function createUsersRef(users) {
+    const usersRef = {}
+
+    users.forEach((user) => {
+        const host_name =  `${user.first_name} ${user.surname}`;
+
+        usersRef[host_name] = user.user_id;
+    })
+
+    return usersRef
+}
+
+function formatProperties(){
+
+}
+module.exports = {formatPropertyTypes:formatPropertyTypes, formatUsers:formatUsers, createUsersRef:createUsersRef, formatProperties: formatProperties};
