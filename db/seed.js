@@ -1,9 +1,17 @@
 const db = require("./connection");
 const format = require("pg-format")
-const {formatPropertyTypes, formatUsers, createUsersRef, formatProperties} = require("./utils/utils")
+const {
+    formatPropertyTypes, 
+    formatUsers, 
+    createUsersRef, 
+    formatProperties, 
+    createPropertyRef, 
+    formatReviews
+    } = require("./utils/utils")
 
-async function seed(propertyTypesData, usersData, propertiesData) {
+async function seed(propertyTypesData, usersData, propertiesData, reviewsData) {
 
+    await db.query(`DROP TABLE IF EXISTS reviews;`)
     await db.query(`DROP TABLE IF EXISTS properties;`)
     await db.query(`DROP TABLE IF EXISTS users;`)
     await db.query(`DROP TABLE IF EXISTS property_types;`)
@@ -34,6 +42,7 @@ async function seed(propertyTypesData, usersData, propertiesData) {
         format(
              `INSERT INTO users (first_name, surname, email, phone_number, is_host, avatar) VALUES %L RETURNING user_id, first_name, surname`, formatUsers(usersData))
          );
+
     await db.query(`CREATE TABLE properties (
         property_id SERIAL PRIMARY KEY,
         host_id INT NOT NULL REFERENCES users(user_id),
@@ -43,10 +52,25 @@ async function seed(propertyTypesData, usersData, propertiesData) {
         price_per_night DECIMAL NOT NULL,
         description TEXT
         )`)
+    
     const usersRef = createUsersRef(insertedUsers);
 
-     await db.query(format(`INSERT INTO properties(host_id, name, location, property_type, price_per_night, description) VALUES %L`, formatProperties(propertiesData, usersRef))
+    const {rows: insertedProperties} = await db.query(format(`INSERT INTO properties(host_id, name, location, property_type, price_per_night, description) VALUES %L RETURNING name, property_id`, formatProperties(propertiesData, usersRef))
     );
+
+    await db.query(`CREATE TABLE reviews (
+            review_id SERIAL PRIMARY KEY,
+            property_id INT NOT NULL REFERENCES properties(property_id),
+            guest_id INT NOT NULL REFERENCES users(user_id),
+            rating INT NOT NULL,
+            comment TEXT,
+            created_at TIMESTAMP DEFAULT NOW()
+            )`)
+    const propertyRef = createPropertyRef(insertedProperties)
+
+    await db.query(format(`INSERT INTO reviews (property_id, guest_id, rating, comment) VALUES %L`, formatReviews(reviewsData, usersRef, propertyRef))
+    );
+            
 }
 
 module.exports = seed;
