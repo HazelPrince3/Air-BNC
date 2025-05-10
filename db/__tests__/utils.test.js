@@ -3,7 +3,8 @@ const {
   formatUsers, 
   createUsersRef, 
   formatProperties,
-  createPropertyRef
+  createPropertyRef,
+  formatReviews
   } = require("../utils/utils");
 
 describe("format property types", () => {
@@ -362,5 +363,103 @@ describe("create properties ref", () => {
 
     expect(testPropertyRef).toEqual({'Modern Apartment in City Center': 1, 'Cosy Family House': 2, 'Chic Studio Near the Beach': 3})
 
+  })
+})
+
+describe("format reviews", () => {
+  test("First element in the array should be the correct property_id from the property reference object", () => {
+    const testReview = [
+      {
+        "guest_name": "Frank White",
+        "property_name": "Chic Studio Near the Beach",
+        "rating": 4,
+        "comment": "Comment about Chic Studio Near the Beach: Great location and cosy space, perfect for a beach getaway."
+      }]
+    const testUserRef = {"Frank White": 1}
+    const testPropertyRef = {"Chic Studio Near the Beach": 1}
+
+    const testFormatReviews = formatReviews(testReview, testUserRef, testPropertyRef)
+
+    expect(testFormatReviews[0][0]).toBe(1)
+  })
+  test("Second element in the array should be the correct user_id from the user reference object", () => {
+    const testReview = [
+      {
+        "guest_name": "Frank White",
+        "property_name": "Chic Studio Near the Beach",
+        "rating": 4,
+        "comment": "Comment about Chic Studio Near the Beach: Great location and cosy space, perfect for a beach getaway."
+      }]
+    const testUserRef = {"Frank White": 1}
+    const testPropertyRef = {"Chic Studio Near the Beach": 1}
+
+    const testFormatReviews = formatReviews(testReview, testUserRef, testPropertyRef)
+
+    expect(testFormatReviews[0][1]).toBe(1)
+  })
+  test("The third element in the array should be the value of the rating property", () => {
+    const testReview = [
+      {
+        "guest_name": "Frank White",
+        "property_name": "Chic Studio Near the Beach",
+        "rating": 4,
+        "comment": "Comment about Chic Studio Near the Beach: Great location and cosy space, perfect for a beach getaway."
+      }]
+    const testUserRef = {"Frank White": 1}
+    const testPropertyRef = {"Chic Studio Near the Beach": 1}
+
+    const testFormatReviews = formatReviews(testReview, testUserRef, testPropertyRef)
+
+    expect(testFormatReviews[0][2]).toBe(4)
+  })
+  test("The fourth element in the array should be the value from the comment property", () => {
+    const testReview = [
+      {
+        "guest_name": "Frank White",
+        "property_name": "Chic Studio Near the Beach",
+        "rating": 4,
+        "comment": "Comment about Chic Studio Near the Beach: Great location and cosy space, perfect for a beach getaway."
+      }]
+    const testUserRef = {"Frank White": 1}
+    const testPropertyRef = {"Chic Studio Near the Beach": 1}
+
+    const testFormatReviews = formatReviews(testReview, testUserRef, testPropertyRef)
+
+    expect(testFormatReviews[0][3]).toBe("Comment about Chic Studio Near the Beach: Great location and cosy space, perfect for a beach getaway.")
+  })
+  test("The fourth element should be null if no comment is provided", () => {
+    const testReview = [
+      {
+        "guest_name": "Frank White",
+        "property_name": "Chic Studio Near the Beach",
+        "rating": 4
+      }]
+    const testUserRef = {"Frank White": 1}
+    const testPropertyRef = {"Chic Studio Near the Beach": 1}
+
+    const testFormatReviews = formatReviews(testReview, testUserRef, testPropertyRef)
+
+    expect(testFormatReviews[0][3]).toBe(null)
+  })
+  test("Should format the correct values into the array for multiple objects", () => {
+    const testReview = [{
+      "guest_name": "Rachel Cummings",
+      "property_name": "Luxury Penthouse with View",
+      "rating": 5,
+      "comment": "Comment about Luxury Penthouse with View: Incredible property! The view from the penthouse is stunning."
+    },
+    {
+      "guest_name": "Frank White",
+      "property_name": "Elegant City Apartment",
+      "rating": 2,
+      "comment": "Comment about Elegant City Apartment: The apartment was nice but not as advertised. The bed was uncomfortable."
+    }]
+
+    const testUserRef = {"Frank White": 1, "Rachel Cummings": 2}
+    const testPropertyRef = {"Luxury Penthouse with View": 1, "Elegant City Apartment": 2}
+
+    const testFormatReviews = formatReviews(testReview, testUserRef, testPropertyRef)
+
+    expect(testFormatReviews).toEqual([[1, 2, 5, "Comment about Luxury Penthouse with View: Incredible property! The view from the penthouse is stunning."], [2, 1, 2, "Comment about Elegant City Apartment: The apartment was nice but not as advertised. The bed was uncomfortable."]])
   })
 })

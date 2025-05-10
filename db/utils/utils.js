@@ -79,10 +79,26 @@ function createPropertyRef(properties) {
     return propertiesRef
 }
 
+function formatReviews(reviews, userRef, propertyRef){
+    const formattedReviews = []
+
+    reviews.forEach((review) => {
+        const property_id = propertyRef[review.property_name]
+        const user_id = userRef[review.guest_name]
+        const rating = review.rating
+
+        const comment = review.hasOwnProperty("comment")? review.comment: null
+
+        formattedReviews.push([property_id, user_id, rating, comment])
+
+    })
+    return formattedReviews
+}
 
 module.exports = {
     formatPropertyTypes:formatPropertyTypes,
     formatUsers:formatUsers, 
     createUsersRef:createUsersRef, 
     formatProperties: formatProperties, 
-    createPropertyRef: createPropertyRef};
+    createPropertyRef: createPropertyRef,
+    formatReviews: formatReviews};
