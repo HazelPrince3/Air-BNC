@@ -1,4 +1,10 @@
-const {formatPropertyTypes, formatUsers, createUsersRef, formatProperties} = require("../utils/utils");
+const {
+  formatPropertyTypes, 
+  formatUsers, 
+  createUsersRef, 
+  formatProperties,
+  createPropertyRef
+  } = require("../utils/utils");
 
 describe("format property types", () => {
     test("Should return an array", () => {
@@ -323,5 +329,38 @@ describe("format properties", () => {
     const testFormatProperties = formatProperties(testProperties, testUserRef)
 
     expect(testFormatProperties).toEqual([[1, "Chic Studio Near the Beach", "Brighton, UK", "Studio", 90.0, "Description of Chic Studio Near the Beach."], [3, "Elegant City Apartment", "Birmingham, UK", "Apartment", 110.0, "Description of Elegant City Apartment."]])
+  })
+})
+
+describe("create properties ref", () => {
+  test("Should return an object", () => {
+    expect(createPropertyRef([])).toEqual({})
+  })
+  test("Should have the property name as a key on the object.", () => {
+    const testProperties = [
+      { name: 'Modern Apartment in City Center', property_id: 1 }];
+    
+    const testPropertyRef = createPropertyRef(testProperties)
+
+    expect(testPropertyRef.hasOwnProperty('Modern Apartment in City Center')).toBe(true)
+  })
+  test("Should have a value of the correct property_id", () => {
+    const testProperties = [
+      { name: 'Modern Apartment in City Center', property_id: 1 }];
+    
+    const testPropertyRef = createPropertyRef(testProperties)
+
+    expect(testPropertyRef['Modern Apartment in City Center']).toBe(1)
+  })
+  test("Should create key value pairs for multiple objects", () => {
+    const testProperties = [
+        { name: 'Modern Apartment in City Center', property_id: 1},
+        { name: 'Cosy Family House', property_id: 2 },
+        { name: 'Chic Studio Near the Beach', property_id: 3 }];
+    
+    const testPropertyRef = createPropertyRef(testProperties)
+
+    expect(testPropertyRef).toEqual({'Modern Apartment in City Center': 1, 'Cosy Family House': 2, 'Chic Studio Near the Beach': 3})
+
   })
 })
