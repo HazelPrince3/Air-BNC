@@ -4,7 +4,8 @@ const {
   createUsersRef, 
   formatProperties,
   createPropertyRef,
-  formatReviews
+  formatReviews,
+  formatImages
   } = require("../utils/utils");
 
 describe("format property types", () => {
@@ -461,5 +462,64 @@ describe("format reviews", () => {
     const testFormatReviews = formatReviews(testReview, testUserRef, testPropertyRef)
 
     expect(testFormatReviews).toEqual([[1, 2, 5, "Comment about Luxury Penthouse with View: Incredible property! The view from the penthouse is stunning."], [2, 1, 2, "Comment about Elegant City Apartment: The apartment was nice but not as advertised. The bed was uncomfortable."]])
+  })
+})
+
+describe("format images", () => {
+  test("First element in the array should be the correct property_id value from the reference object", () => {
+    const testImages = [
+      {
+        "property_name": "Modern Apartment in City Center",
+        "image_url": "https://example.com/images/modern_apartment_1.jpg",
+        "alt_tag": "Alt tag for Modern Apartment in City Center"
+      }]
+    const testPropertyRef = {'Modern Apartment in City Center': 1}
+
+    const testFormatImages = formatImages(testImages, testPropertyRef)
+
+    expect(testFormatImages[0][0]).toBe(1)
+  })
+  test("Second element should be the value of the image_url property", () => {
+    const testImages = [
+      {
+        "property_name": "Modern Apartment in City Center",
+        "image_url": "https://example.com/images/modern_apartment_1.jpg",
+        "alt_tag": "Alt tag for Modern Apartment in City Center"
+      }]
+    const testPropertyRef = {'Modern Apartment in City Center': 1}
+
+    const testFormatImages = formatImages(testImages, testPropertyRef)
+
+    expect(testFormatImages[0][1]).toBe("https://example.com/images/modern_apartment_1.jpg")
+  })
+  test("The third element should be the value of alt_tag property", () => {
+    const testImages = [
+      {
+        "property_name": "Modern Apartment in City Center",
+        "image_url": "https://example.com/images/modern_apartment_1.jpg",
+        "alt_tag": "Alt tag for Modern Apartment in City Center"
+      }]
+    const testPropertyRef = {'Modern Apartment in City Center': 1}
+
+    const testFormatImages = formatImages(testImages, testPropertyRef)
+
+    expect(testFormatImages[0][2]).toBe("Alt tag for Modern Apartment in City Center")
+  })
+  test("Should format the correct values into the array for multiple objects", () => {
+    const testImages = [
+      {
+        "property_name": "Modern Apartment in City Center",
+        "image_url": "https://example.com/images/modern_apartment_1.jpg",
+        "alt_tag": "Alt tag for Modern Apartment in City Center"
+      }, {
+        "property_name": "Chic Studio Near the Beach",
+        "image_url": "https://example.com/images/chic_studio_1.jpg",
+        "alt_tag": "Alt tag for Chic Studio Near the Beach"
+      }]
+    const testPropertyRef = {'Modern Apartment in City Center': 1, "Chic Studio Near the Beach": 2}
+
+    const testFormatImages = formatImages(testImages, testPropertyRef)
+
+    expect(testFormatImages).toEqual([[1, "https://example.com/images/modern_apartment_1.jpg", "Alt tag for Modern Apartment in City Center"], [2, "https://example.com/images/chic_studio_1.jpg", "Alt tag for Chic Studio Near the Beach"]])
   })
 })

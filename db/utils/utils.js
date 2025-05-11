@@ -79,10 +79,10 @@ function createPropertyRef(properties) {
     return propertiesRef
 }
 
-function formatReviews(reviews, userRef, propertyRef){
+function formatReviews(reviewsData, userRef, propertyRef){
     const formattedReviews = []
 
-    reviews.forEach((review) => {
+    reviewsData.forEach((review) => {
         const property_id = propertyRef[review.property_name]
         const user_id = userRef[review.guest_name]
         const rating = review.rating
@@ -95,10 +95,24 @@ function formatReviews(reviews, userRef, propertyRef){
     return formattedReviews
 }
 
+function formatImages(imagesData, propertyRef) {
+    const formattedImages = []
+
+    imagesData.forEach((image) => {
+        const property_id = propertyRef[image.property_name]
+        const image_url = image.image_url
+        const alt_text = image.alt_tag
+        formattedImages.push([property_id, image_url, alt_text])
+    })
+
+    return formattedImages
+}
+
 module.exports = {
     formatPropertyTypes:formatPropertyTypes,
     formatUsers:formatUsers, 
     createUsersRef:createUsersRef, 
     formatProperties: formatProperties, 
     createPropertyRef: createPropertyRef,
-    formatReviews: formatReviews};
+    formatReviews: formatReviews,
+    formatImages: formatImages};
