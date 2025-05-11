@@ -6,11 +6,13 @@ const {
     createUsersRef, 
     formatProperties, 
     createPropertyRef, 
-    formatReviews
+    formatReviews,
+    formatImages
     } = require("./utils/utils")
 
-async function seed(propertyTypesData, usersData, propertiesData, reviewsData) {
+async function seed(propertyTypesData, usersData, propertiesData, reviewsData, imagesData) {
 
+    await db.query(`DROP TABLE IF EXISTS images;`)
     await db.query(`DROP TABLE IF EXISTS reviews;`)
     await db.query(`DROP TABLE IF EXISTS properties;`)
     await db.query(`DROP TABLE IF EXISTS users;`)
@@ -44,14 +46,14 @@ async function seed(propertyTypesData, usersData, propertiesData, reviewsData) {
          );
 
     await db.query(`CREATE TABLE properties (
-        property_id SERIAL PRIMARY KEY,
-        host_id INT NOT NULL REFERENCES users(user_id),
-        name VARCHAR NOT NULL, 
-        location VARCHAR NOT NULL,
-        property_type VARCHAR NOT NULL REFERENCES property_types(property_type),
-        price_per_night DECIMAL NOT NULL,
-        description TEXT
-        )`)
+                    property_id SERIAL PRIMARY KEY,
+                    host_id INT NOT NULL REFERENCES users(user_id),
+                    name VARCHAR NOT NULL, 
+                    location VARCHAR NOT NULL,
+                    property_type VARCHAR NOT NULL REFERENCES property_types(property_type),
+                    price_per_night DECIMAL NOT NULL,
+                    description TEXT
+                   )`)
     
     const usersRef = createUsersRef(insertedUsers);
 
@@ -59,18 +61,28 @@ async function seed(propertyTypesData, usersData, propertiesData, reviewsData) {
     );
 
     await db.query(`CREATE TABLE reviews (
-            review_id SERIAL PRIMARY KEY,
-            property_id INT NOT NULL REFERENCES properties(property_id),
-            guest_id INT NOT NULL REFERENCES users(user_id),
-            rating INT NOT NULL,
-            comment TEXT,
-            created_at TIMESTAMP DEFAULT NOW()
-            )`)
+                    review_id SERIAL PRIMARY KEY,
+                    property_id INT NOT NULL REFERENCES properties(property_id),
+                    guest_id INT NOT NULL REFERENCES users(user_id),
+                    rating INT NOT NULL,
+                    comment TEXT,
+                    created_at TIMESTAMP DEFAULT NOW()
+                 )`)
     const propertyRef = createPropertyRef(insertedProperties)
 
     await db.query(format(`INSERT INTO reviews (property_id, guest_id, rating, comment) VALUES %L`, formatReviews(reviewsData, usersRef, propertyRef))
     );
-            
+    
+    await db.query(`CREATE TABLE images (
+                    image_id SERIAL PRIMARY KEY,
+                    property_id INT NOT NULL REFERENCES properties(property_id),
+                    image_url VARCHAR NOT NULL,
+                    alt_text VARCHAR NOT NULL
+                    )`)
+    await db.query(format(`INSERT INTO images (property_id, image_url, alt_text) VALUES %L`, formatImages(imagesData, propertyRef))
+    );
+
+    
 }
 
 module.exports = seed;
