@@ -108,6 +108,53 @@ function formatImages(imagesData, propertyRef) {
     return formattedImages
 }
 
+function formatFavourites(favouritesData, userRef, propertyRef) {
+    const formattedFavourites = []
+
+    favouritesData.forEach((favourite) => {
+        const guest_id = userRef[favourite.guest_name]
+        const property_id = propertyRef[favourite.property_name]
+        
+        formattedFavourites.push([guest_id, property_id])
+    })
+
+    return formattedFavourites
+}
+
+function getAmenities(propertiesData) {
+    const formattedAmenities = []
+
+    const amenityArr = []
+    const amenityObj = {}
+    propertiesData.forEach((property) => {
+        const amenities = property.amenities
+        amenityArr.push(amenities)
+    })
+
+    const flattenedAmenityArr = amenityArr.flat(1)
+    flattenedAmenityArr.forEach((amenity) => {
+        amenityObj[amenity] = null
+    })
+    for(let key in amenityObj){
+        formattedAmenities.push([key])
+    }    
+    return formattedAmenities
+}
+
+function formatPropertiesAmenities(propertiesData, propertyRef) {
+    const formattedPropertiesAmenities = []
+
+    propertiesData.forEach((property) => {
+        const property_id = propertyRef[property.name]
+        const amenities = property.amenities
+
+        amenities.forEach((amenity) => {
+           formattedPropertiesAmenities.push([property_id, amenity])
+        })
+    })
+    
+    return formattedPropertiesAmenities
+}
 module.exports = {
     formatPropertyTypes:formatPropertyTypes,
     formatUsers:formatUsers, 
@@ -115,4 +162,7 @@ module.exports = {
     formatProperties: formatProperties, 
     createPropertyRef: createPropertyRef,
     formatReviews: formatReviews,
-    formatImages: formatImages};
+    formatImages: formatImages,
+    formatFavourites: formatFavourites,
+    getAmenities: getAmenities,
+    formatPropertiesAmenities: formatPropertiesAmenities};
