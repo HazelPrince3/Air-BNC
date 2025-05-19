@@ -7,17 +7,16 @@ const {
     formatProperties, 
     createPropertyRef, 
     formatReviews,
-    formatImages
+    formatImages,
+    formatFavourites,
+    getAmenities,
+    formatPropertiesAmenities
     } = require("./utils/utils")
+const dropTables = require("./drop-tables")
 
-async function seed(propertyTypesData, usersData, propertiesData, reviewsData, imagesData) {
+async function seed(propertyTypesData, usersData, propertiesData, reviewsData, imagesData, favouritesData) {
 
-    await db.query(`DROP TABLE IF EXISTS images;`)
-    await db.query(`DROP TABLE IF EXISTS reviews;`)
-    await db.query(`DROP TABLE IF EXISTS properties;`)
-    await db.query(`DROP TABLE IF EXISTS users;`)
-    await db.query(`DROP TABLE IF EXISTS property_types;`)
-
+    await dropTables()
 
     await db.query(`CREATE TABLE property_types(
                     property_type VARCHAR(100) PRIMARY KEY,
@@ -82,7 +81,33 @@ async function seed(propertyTypesData, usersData, propertiesData, reviewsData, i
     await db.query(format(`INSERT INTO images (property_id, image_url, alt_text) VALUES %L`, formatImages(imagesData, propertyRef))
     );
 
+    await db.query(`CREATE TABLE favourites (
+                    favourite_id SERIAL PRIMARY KEY,
+                    guest_id INT NOT NULL REFERENCES users(user_id),
+                    property_id INT NOT NULL REFERENCES properties(property_id)
+                    )`)
+
+    await db.query(format(`INSERT INTO favourites (guest_id, property_id) VALUES %L`, formatFavourites(favouritesData, usersRef, propertyRef)));
+
+    await db.query(`CREATE TABLE amenities (
+                   amenity VARCHAR PRIMARY KEY)`)
     
+    await db.query(format(`INSERT INTO amenities (amenity) VALUES %L `, getAmenities(propertiesData)))
+
+    await db.query(`CREATE TABLE properties_amenities (
+                    property_id INT NOT NULL REFERENCES properties(property_id),
+                    amenity_slug VARCHAR NOT NULL REFERENCES amenities(amenity))`)
+
+    await db.query(format(`INSERT INTO properties_amenities (property_id, amenity_slug) VALUES %L`, formatPropertiesAmenities(propertiesData, propertyRef)))
+
+    await db.query(`CREATE TABLE bookings (
+                    booking_id SERIAL PRIMARY KEY,
+                    property_id INT NOT NULL REFERENCES properties(property_id),
+                    guest_id INT NOT NULL REFERENCES users(user_id),
+                    check_in_date DATE NOT NULL,
+                    check_out_date DATE NOT NULL,
+                    created_at TIMESTAMP DEFAULT NOW()
+                    )`)
 }
 
 module.exports = seed;
