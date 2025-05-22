@@ -4,7 +4,8 @@
   "description": "This repository mimics the functionality of the Air BnB website.  It will connect and insert data into a database using Node-Postgres.",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
+    "test-utils": "jest utils",
+    "test-app": "jest app",
     "setup-db": "psql -f ./db/setup_db.sql",
     "seed": "node ./db/seed-run.js"
   },
@@ -25,6 +26,7 @@
   },
   "dependencies": {
     "dotenv": "^16.5.0",
+    "express": "^5.1.0",
     "pg": "^8.15.6",
     "pg-format": "^1.0.4"
   }
