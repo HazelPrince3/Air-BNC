@@ -1,10 +1,18 @@
 const db = require("../db/connection");
 
-exports.selectProperties = async(maxprice, minprice, sort, order) => {
+exports.selectProperties = async(maxprice, minprice, sort, order, host) => {
 
+    const validSort = ["price_per_night", "popularity", undefined]
+    if(validSort.includes(sort) === false){
+        return Promise.reject({status: 400, msg: "Bad request."})
+    }
+    const validOrders = ["ascending", "descending", undefined]
+    if(validOrders.includes(order) === false){
+        return Promise.reject({status: 400, msg: "Bad request."})
+    }
     let queryValues = []
 
-    let queryStr = `SELECT properties.property_id, name, location, price_per_night, first_name, surname, COUNT(favourites.property_id)
+    let queryStr = `SELECT properties.property_id, host_id, name, location, price_per_night, first_name, surname, COUNT(favourites.property_id)
                     FROM properties
                     JOIN users
                     ON users.user_id = properties.host_id
@@ -12,7 +20,7 @@ exports.selectProperties = async(maxprice, minprice, sort, order) => {
                     ON favourites.property_id = properties.property_id`
 
     if(sort === "price_per_night"){
-        queryStr = `SELECT properties.property_id, name, location, price_per_night, first_name, surname
+        queryStr = `SELECT properties.property_id, host_id name, location, price_per_night, first_name, surname
                     FROM properties
                     JOIN users
                     ON users.user_id = properties.host_id`
@@ -22,6 +30,9 @@ exports.selectProperties = async(maxprice, minprice, sort, order) => {
         queryValues.push(maxprice)
         queryStr += ` WHERE price_per_night <= $1`
     }
+    if(isNaN(maxprice) && maxprice !== undefined){
+        return Promise.reject({status: 400, msg: "Bad request."})
+    }
     if(minprice > 0 && minprice < 100000000000){
         if(queryValues.length){
             queryStr += ` AND`
@@ -29,12 +40,26 @@ exports.selectProperties = async(maxprice, minprice, sort, order) => {
         queryValues.push(minprice)
         queryStr += ` price_per_night >= $${queryValues.length}`
     }
-
-    let groupBy = ` GROUP BY properties.property_id, name, location, price_per_night, first_name, surname`
+    if(isNaN(minprice) && minprice !== undefined){
+        return Promise.reject({status: 400, msg: "Bad request."})
+    }
+    
+    if(host > 0 && host < 100000000000000){
+        if(queryValues.length){
+            queryStr += ` AND`
+        } else {queryStr += ` WHERE`}
+        queryValues.push(host)
+        queryStr += ` host_id = $${queryValues.length}`
+    }
+    if(isNaN(host) && host !== undefined){
+        return Promise.reject({status: 400, msg: "Bad request."})
+    }
+    
+    let groupBy = ` GROUP BY properties.property_id, name, location, price_per_night, first_name, surname, host_id`
 
     let sortBy = ` ORDER BY COUNT(favourites.property_id) DESC;`
 
-    if(order === "ascending"){
+    if(order === "ascending" || sort === "popularity"){
         sortBy = ` ORDER BY COUNT(favourites.property_id) ASC;` 
     }
     
@@ -44,22 +69,19 @@ exports.selectProperties = async(maxprice, minprice, sort, order) => {
         } else{queryStr += ` ORDER BY price_per_night;`}
     } else {queryStr += groupBy += sortBy}
 
- 
-    console.log(queryStr)
-
     const {rows} = await db.query(queryStr, queryValues);
 
-    console.log(rows)
-
     const propertiesData = rows.map((row) => {
-        const {property_id, name, location, price_per_night, first_name, surname} = row
+        const {property_id, name, location, price_per_night, first_name, surname, count, host_id} = row
 
         const propertyObj = {
             property_id: property_id,
             property_name: name,
             location: location, 
             price_per_night: price_per_night,
-            host: `${first_name} ${surname}`
+            host: `${first_name} ${surname}`,
+            count: count,
+            host_id: host_id
         }
 
         return propertyObj
@@ -68,13 +90,3 @@ exports.selectProperties = async(maxprice, minprice, sort, order) => {
     return propertiesData;
 }
 
-exports.selectReviewsByProperty = async(id) => {
-
-   const {rows} = await db.query(`SELECT review_id, comment, rating, created_at, first_name, surname, avatar, AVG(rating) AS avg_rating
-                         FROM reviews
-                         JOIN users
-                         ON users.user_id = reviews.guest_id
-                         WHERE property_id = ${id};`)
-
-   console.log(rows, "<<<<<<<")
-}

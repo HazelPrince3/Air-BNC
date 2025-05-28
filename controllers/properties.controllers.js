@@ -1,19 +1,15 @@
-const {selectProperties, selectReviewsByProperty} = require("../models/properties.models")
+const {selectProperties} = require("../models/properties.models")
 
 exports.getProperties = async (req, res, next) => {
     
-    const {maxprice, minprice, sort, order} = req.query
-    
-    const properties = await selectProperties(maxprice, minprice, sort, order)
+    const {maxprice, minprice, sort, order, host} = req.query
+    try{
+        const properties = await selectProperties(maxprice, minprice, sort, order, host)
    
-    res.status(200).send({properties})
+        console.log(properties)
+        res.status(200).send({properties})
+    }catch(error){
+        next(error)
+    }
 }
 
-exports.getPropertyReviews = async (req, res, next) => {
-
-    const {id} = req.params
-
-    const reviews = await selectReviewsByProperty(id)
-
-    res.status(200).send({reviews})
-}
