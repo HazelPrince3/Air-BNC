@@ -168,6 +168,47 @@ describe("app", () => {
         test("Responds with a status of 200", async() =>{
             await request(app).get("/api/properties/1").expect(200)
         })
+        test("Responds with an object containing property_id, property_name, location, price_per_night, description, host, host_avatar, favourite_count", async() => {
+            const {body} = await request(app).get("/api/properties/10")
+
+            expect(body.property.hasOwnProperty("property_id")).toBe(true)
+            expect(body.property.hasOwnProperty("property_name")).toBe(true)
+            expect(body.property.hasOwnProperty("location")).toBe(true)
+            expect(body.property.hasOwnProperty("price_per_night")).toBe(true)
+            expect(body.property.hasOwnProperty("description")).toBe(true)
+            expect(body.property.hasOwnProperty("host")).toBe(true)
+            expect(body.property.hasOwnProperty("host_avatar")).toBe(true)
+            expect(body.property.hasOwnProperty("favourite_count")).toBe(true)
+        })
+        test("Invalid id responds with a status:400 and msg: Bad request", async() => {
+             const {body} = await request(app).get("/api/properties/invalid-id").expect(400)
+
+             expect(body.msg).toBe("Bad request.")
+        })
+        test("Valid id but non-existent responds with a status:404 and msg: Id not found", async() => {
+            const {body} = await request(app).get("/api/properties/1000").expect(404)
+
+             expect(body.msg).toBe("Property not found.")
+        })
+        test("User can see whether a specific user_id has favourited the property", async() => {
+            const {body: trueTest} = await request(app).get("/api/properties/1?user_id=2")
+
+            expect(trueTest.property.favourited).toBe(true)
+
+            const {body:falseTest} = await request(app).get("/api/properties/1?user_id=1")
+
+            expect(falseTest.property.favourited).toBe(false)
+        })
+        test("Invalid user_id responds with a status:400 and msg: Bad request", async() => {
+            const {body} = await request(app).get("/api/properties/1?user_id=invalid-user-id").expect(400)
+
+            expect(body.msg).toBe("Bad request.")
+        })
+        test("Valid user_id but non-existent responds a status of 200 and the favourited key should have a value of false", async() => {
+            const {body} = await request(app).get("/api/properties/1?user_id=10000").expect(200)
+
+            expect(body.property.favourited).toBe(false)
+        })
     })
 
     

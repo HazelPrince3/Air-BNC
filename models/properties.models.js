@@ -16,7 +16,7 @@ exports.selectProperties = async(maxprice, minprice, sort, order, host) => {
                     FROM properties
                     JOIN users
                     ON users.user_id = properties.host_id
-                    JOIN favourites
+                    LEFT JOIN favourites
                     ON favourites.property_id = properties.property_id`
 
     if(sort === "price_per_night"){
@@ -71,6 +71,9 @@ exports.selectProperties = async(maxprice, minprice, sort, order, host) => {
 
     const {rows} = await db.query(queryStr, queryValues);
 
+    if(rows.length === 0){
+        return Promise.reject({status: 404, msg: "Host not found"})
+    }
     const propertiesData = rows.map((row) => {
         const {property_id, name, location, price_per_night, first_name, surname, count, host_id} = row
 
@@ -89,4 +92,37 @@ exports.selectProperties = async(maxprice, minprice, sort, order, host) => {
     
     return propertiesData;
 }
+
+exports.selectSingleProperty = async(id, user_id) => {
+
+    let queryStr = `SELECT properties.property_id, name AS property_name, location, price_per_night, description, CONCAT(first_name, ' ', surname) host, avatar AS host_avatar, COUNT(favourites.property_id) AS favourite_count
+        FROM properties
+        JOIN users
+        ON properties.host_id = users.user_id
+        LEFT JOIN favourites
+        ON favourites.property_id = properties.property_id
+        WHERE properties.property_id = $1
+        GROUP BY properties.property_id, property_name, location, price_per_night, description, host, host_avatar
+        ;`
+
+    const {rows : [property]} = await db.query(queryStr, [id])
+
+    
+    if(user_id){
+        const {rows: favourited} = await db.query(`SELECT favourite_id
+            FROM favourites
+            WHERE guest_id = $1
+            AND property_id = $2;`, [user_id, id])
+        if(favourited.length){
+            property.favourited = true
+        }else{property.favourited = false}
+    }
+    
+    if(property === undefined){
+        return Promise.reject({status: 404, msg: "Property not found."})
+    }
+    return property
+}
+
+   
 

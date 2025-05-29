@@ -1,15 +1,21 @@
-const {selectProperties} = require("../models/properties.models")
+const {selectProperties, selectSingleProperty} = require("../models/properties.models")
 
 exports.getProperties = async (req, res, next) => {
     
     const {maxprice, minprice, sort, order, host} = req.query
-    try{
+
         const properties = await selectProperties(maxprice, minprice, sort, order, host)
    
-        console.log(properties)
         res.status(200).send({properties})
-    }catch(error){
-        next(error)
-    }
+}
+
+exports.getSingleProperty = async (req, res, next) => {
+
+    const {id} = req.params
+    const {user_id} = req.query
+
+    const property = await selectSingleProperty(id, user_id)
+
+    res.status(200).send({property})
 }
 
