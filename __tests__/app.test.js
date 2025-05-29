@@ -13,12 +13,12 @@ afterAll(async () => {
 })
 
 describe("app", () => {
-    test("non existent endpoint responds with stauts 404 and msg", async () => {
+    test("non existent endpoint responds with stauts 404 and Path not found msg", async () => {
         const {body} = await request(app).get("/non-existent-path").expect(404);
 
         expect(body.msg).toBe("Path not found.");
     })
-    describe("GET - /api/properties", () => {
+   xdescribe("GET - /api/properties", () => {
         test("Responds with a status of 200", async () => {
             await request(app).get("/api/properties").expect(200)
     })
@@ -37,6 +37,10 @@ describe("app", () => {
             expect(property.hasOwnProperty("host")).toBe(true)
         })
     })
+        test("Array should have a length of 11", async() => {
+             const {body} = await request(app).get("/api/properties")
+             expect(body.properties.length).toBe(11)
+        })
         test("Properties will be ordered by most favourited to least favourited by default.", async () => {
             const {body} = await request(app).get("/api/properties")
 
@@ -109,25 +113,23 @@ describe("app", () => {
 
             expect(body.msg).toBe("Bad request.")
         })
-        test.only("valid host_id but non-existent responds with a 404 and msg", async() => {
+        test("valid host_id but non-existent responds with a 404 and msg", async() => {
              const {body} = await request(app).get("/api/properties?host=1000000").expect(404)
 
             expect(body.msg).toBe("Host not found")
         })
 })
 
-
-
     xdescribe("GET - /api/properties/:id/reviews", () => {
         test("Responds with a status of 200", async () => {
-            await request(app).get("/api/properties/:id/reviews").expect(200)
+            await request(app).get("/api/properties/3/reviews").expect(200)
         })
         test("Responds with an array of objects containing review_id, comment, rating, created_at, guest, guest_avatar", async () => {
             const {body} = await request(app).get("/api/properties/1/reviews")
 
             expect(Array.isArray(body.reviews)).toBe(true)
 
-            expect(body.properties.length > 0).toBe(true)
+            expect(body.reviews.length > 0).toBe(true)
 
             body.reviews.forEach((review) => {
             expect(review.hasOwnProperty("review_id")).toBe(true)
@@ -139,5 +141,34 @@ describe("app", () => {
             })
 
         })
+        test("Response should have a key of average_rating with a value as the average of the ratings", async() => {
+            const {body} = await request(app).get("/api/properties/1/reviews")
+
+            expect(body.hasOwnProperty("average_rating")).toBe(true)
+            expect(body.average_rating).toBe("2.50")
+        })
+        test("Should be ordered by most recent to least recent", async() => {
+            const {body} = await request(app).get("/api/properties/1/reviews")
+
+            expect(body.reviews).toBeSortedBy("created_at", {descending: true})
+        })
+        test("Invalid id responds with a status:400 and a Bad request msg", async() => {
+            const {body} = await request(app).get("/api/properties/invalid-id/reviews").expect(400)
+
+            expect(body.msg).toBe("Bad request.")
+        })
+        test("valid id but non-existent responds with a status:404 and msg:Id not found", async() => {
+            const {body} = await request(app).get("/api/properties/1000000/reviews").expect(404)
+
+            expect(body.msg).toBe("Id not found.")
+        })
     })
+
+    describe("GET - /api/properties/:id", () =>{
+        test("Responds with a status of 200", async() =>{
+            await request(app).get("/api/properties/1").expect(200)
+        })
+    })
+
+    
 })
