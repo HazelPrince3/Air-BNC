@@ -24,3 +24,15 @@ exports.selectReviewsByProperty = async(id) => {
     return formattedReviews
    
 }
+
+exports.insertPropertyReview = async(guest_id, rating, comment, id) => {
+    await db.query(`INSERT INTO reviews (guest_id, rating, comment, property_id) 
+        VALUES ($1, $2, $3, $4);`, [guest_id, rating, comment, id])
+
+    const {rows: [review]} = await db.query(`SELECT * FROM reviews    WHERE guest_id = $1
+        AND rating = $2
+        AND comment = $3
+        AND property_id = $4;`, [guest_id, rating, comment, id])
+    
+    return review
+}

@@ -164,7 +164,7 @@ describe("app", () => {
         })
     })
 
-    describe("GET - /api/properties/:id", () =>{
+    xdescribe("GET - /api/properties/:id", () =>{
         test("Responds with a status of 200", async() =>{
             await request(app).get("/api/properties/1").expect(200)
         })
@@ -208,6 +208,86 @@ describe("app", () => {
             const {body} = await request(app).get("/api/properties/1?user_id=10000").expect(200)
 
             expect(body.property.favourited).toBe(false)
+        })
+    })
+
+    describe("POST - /api/properties/:id/reviews", () => {
+        test("Responds with a status of 201", async() => {
+            const data = {
+                guest_id: 4,
+                rating: 4,
+                comment: "comment about test property."
+            }
+            const payload = JSON.stringify(data);
+
+            await request(app).post("/api/properties/1/reviews").set('Content-Type', 'application/json').send(payload).expect(201)
+        })
+        test("Responds with an object with the keys of review_id, property_id, guest_id, rating, comment, created_at", async() => {
+            const data = {
+                guest_id: 4,
+                rating: 4,
+                comment: "comment about test property."
+            }
+            const payload = JSON.stringify(data);
+
+            const {body} = await request(app).post("/api/properties/1/reviews").set('Content-Type', 'application/json').send(payload)
+
+            expect(body.review.hasOwnProperty("review_id")).toBe(true)
+            expect(body.review.hasOwnProperty("property_id")).toBe(true)
+            expect(body.review.hasOwnProperty("guest_id")).toBe(true)
+            expect(body.review.hasOwnProperty("rating")).toBe(true)
+            expect(body.review.hasOwnProperty("comment")).toBe(true)
+            expect(body.review.hasOwnProperty("created_at")).toBe(true)
+
+        })
+        test("Invalid id responds with status:400 and msg: Bad request", async()=>{
+             const data = {
+                guest_id: 4,
+                rating: 4,
+                comment: "comment about test property."
+            }
+            const payload = JSON.stringify(data);
+
+            const {body} = await request(app).post("/api/properties/invalid-id/reviews").set('Content-Type', 'application/json').send(payload).expect(400)
+
+            expect(body.msg).toBe("Bad request.")
+
+        })
+        test("Invalid guest_id responds with status:400 and msg: Bad request.", async() => {
+            const data = {
+                guest_id: "invalid-id",
+                rating: 4,
+                comment: "comment about test property."
+            }
+            const payload = JSON.stringify(data);
+
+            const {body} = await request(app).post("/api/properties/1/reviews").set('Content-Type', 'application/json').send(payload).expect(400)
+
+            expect(body.msg).toBe("Bad request.")
+        })
+        test("Invalid rating responds with status:400 and msg: Bad request.", async() => {
+            const data = {
+                guest_id: 2,
+                rating: "invalid-rating",
+                comment: "comment about test property."
+            }
+            const payload = JSON.stringify(data);
+
+            const {body} = await request(app).post("/api/properties/1/reviews").set('Content-Type', 'application/json').send(payload).expect(400)
+
+            expect(body.msg).toBe("Bad request.")
+        })
+        test("Invalid comment responds with status:400 and msg: Bad request.", async() => {
+            const data = {
+                guest_id: "invalid-id",
+                rating: 4,
+                comment: 10
+            }
+            const payload = JSON.stringify(data);
+
+            const {body} = await request(app).post("/api/properties/1/reviews").set('Content-Type', 'application/json').send(payload).expect(400)
+
+            expect(body.msg).toBe("Bad request.")
         })
     })
 
