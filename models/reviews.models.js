@@ -36,3 +36,13 @@ exports.insertPropertyReview = async(guest_id, rating, comment, id) => {
     
     return review
 }
+
+exports.deleteReviewById = async(id) => {
+    
+    const {rowCount} = await db.query("DELETE FROM reviews WHERE review_id = $1", [id])
+
+    if(rowCount === 0){
+        return Promise.reject({status: 404, msg: "Review not found."})
+    }
+    
+}

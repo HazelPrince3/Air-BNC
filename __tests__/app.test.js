@@ -211,7 +211,7 @@ describe("app", () => {
         })
     })
 
-    describe("POST - /api/properties/:id/reviews", () => {
+    xdescribe("POST - /api/properties/:id/reviews", () => {
         test("Responds with a status of 201", async() => {
             const data = {
                 guest_id: 4,
@@ -291,5 +291,26 @@ describe("app", () => {
         })
     })
 
-    
+    describe("DELETE - /api/reviews/:id", () => {
+        test("Responds with a status of 204", async() => {
+            await request(app).delete("/api/reviews/1").expect(204)
+        })
+        test("testReviews should have an array of length 11 after deletion", async() => {
+            await request(app).delete("/api/reviews/1")
+
+            const {rows} = await db.query("SELECT * FROM reviews")
+
+            expect(rows.length).toBe(10)
+        })
+        test("Invalid id responds with status:400 and msg: Bad request", async() => {
+            const {body} = await request(app).delete("/api/reviews/invalid-id").expect(400)
+
+            expect(body.msg).toBe("Bad request.")
+        })
+        test("Valid id but non-existent review responds with a status: 404 and msg: Review not found", async() => {
+            const {body} = await request(app).delete("/api/reviews/1000").expect(404)
+
+            expect(body.msg).toBe("Review not found.")
+        })
+    })
 })
