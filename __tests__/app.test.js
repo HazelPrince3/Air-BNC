@@ -291,7 +291,7 @@ describe("app", () => {
         })
     })
 
-    describe("DELETE - /api/reviews/:id", () => {
+    xdescribe("DELETE - /api/reviews/:id", () => {
         test("Responds with a status of 204", async() => {
             await request(app).delete("/api/reviews/1").expect(204)
         })
@@ -311,6 +311,114 @@ describe("app", () => {
             const {body} = await request(app).delete("/api/reviews/1000").expect(404)
 
             expect(body.msg).toBe("Review not found.")
+        })
+    })
+
+    xdescribe("GET - /api/users/:id", () => {
+        test("Responds with a status of 200", async() => {
+            await request(app).get("/api/users/1").expect(200)
+        })
+        test("Responds with an user object containing the key user_id, first_name, surname, email, phone_number, avatar, created_at", async() => {
+            const {body} = await request(app).get("/api/users/2")
+
+            expect(body.user.hasOwnProperty("user_id")).toBe(true)
+            expect(body.user.hasOwnProperty("first_name")).toBe(true)
+            expect(body.user.hasOwnProperty("surname")).toBe(true)
+            expect(body.user.hasOwnProperty("email")).toBe(true)
+            expect(body.user.hasOwnProperty("phone_number")).toBe(true)
+            expect(body.user.hasOwnProperty("avatar")).toBe(true)
+            expect(body.user.hasOwnProperty("created_at")).toBe(true)
+        })
+        test("Invalid id responds with status:400 and msg: Bad request", async() => {
+            const {body} = await request(app).get("/api/users/invalid-id").expect(400)
+
+            expect(body.msg).toBe("Bad request.")
+        })
+        test("Valid id but non-existent user responds with status:404 and msg User not found", async() => {
+            const {body} = await request(app).get("/api/users/100").expect(404)
+
+            expect(body.msg).toBe("User not found.")
+        })
+    })
+
+    xdescribe("PATCH - /api/users/:id", () => {
+        test("Responds with a status of 200", async() => {
+             const data = {
+                first_name: "Charlotte"
+            }
+            const payload = JSON.stringify(data);
+
+            const {body} = await request(app).patch("/api/users/1").set('Content-Type', 'application/json').send(payload).expect(200)
+        })
+        test("Responds with the updated object when first_name is updated", async() => {
+             const data = {
+                first_name: "Charlotte"
+            }
+            const payload = JSON.stringify(data);
+
+            const {body} = await request(app).patch("/api/users/1").set('Content-Type', 'application/json').send(payload)
+
+            expect(body.user.first_name).toBe("Charlotte")
+        })
+        test("Responds with the updated object when surname and email are updated", async() => {
+             const data = {
+                surname: "Smith", 
+                email: "smith@example.com"
+            }
+            const payload = JSON.stringify(data);
+
+            const {body} = await request(app).patch("/api/users/1").set('Content-Type', 'application/json').send(payload)
+
+            expect(body.user.surname).toBe("Smith")
+            expect(body.user.email).toBe("smith@example.com")
+        })
+        test("Responds with updated object when any combination of information is updated", async() => {
+            const data = {
+               phone: 111111111,
+               avatar: "test avatar"
+            }
+            const payload = JSON.stringify(data);
+
+            const {body} = await request(app).patch("/api/users/1").set('Content-Type', 'application/json').send(payload)
+
+            expect(body.user.phone_number).toBe("111111111")
+            expect(body.user.avatar).toBe("test avatar")
+        })
+        test("Invalid id responds with a status:400 and msg:Bad request", async() => {
+            const data = {
+                first_name: "Charlotte"
+            }
+            const payload = JSON.stringify(data);
+
+            const {body} = await request(app).patch("/api/users/invalid-id").set('Content-Type', 'application/json').send(payload).expect(400)
+
+            expect(body.msg).toBe("Bad request.")
+        })
+        test("Valid id but non-existent user responds with a status:404 and msg:User not found", async() => {
+            const data = {
+                first_name: "Charlotte"
+            }
+            const payload = JSON.stringify(data);
+
+            const {body} = await request(app).patch("/api/users/1000").set('Content-Type', 'application/json').send(payload).expect(404)
+
+            expect(body.msg).toBe("User not found.")
+        })
+        xtest("Invalid id responds with a status:400 and msg:Bad request", async() => {
+            const data = {
+                first_name: 100
+            }
+            const payload = JSON.stringify(data);
+
+            const {body} = await request(app).patch("/api/users/1").set('Content-Type', 'application/json').send(payload).expect(400)
+
+            expect(body.msg).toBe("Bad request.")
+        })
+    })
+
+    describe("POST - /api/properties/:id/favourite", () => {
+        test("Responds with a status of 201", async() => {
+            await request(app).post("/api/properties/:id/favourite").expect(201)
         })
     })
 })

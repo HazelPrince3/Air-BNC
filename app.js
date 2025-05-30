@@ -1,7 +1,7 @@
 const express = require("express")
 const {getProperties, getSingleProperty} = require("./controllers/properties.controllers")
 const {getPropertyReviews, postPropertyReview, deletePropertyReview} = require("./controllers/reviews.controllers")
-const {getUserData} = require("./controllers/users.controllers")
+const {getUserData, patchUserInformation} = require("./controllers/users.controllers")
 const {handlePathNotFound, handleCustomError, handleBadRequest, handleServerError} = require("./controllers/errors")
 const app = express()
 
@@ -18,6 +18,10 @@ app.post("/api/properties/:id/reviews", postPropertyReview)
 app.delete("/api/reviews/:id", deletePropertyReview)
 
 app.get("/api/users/:id", getUserData)
+
+app.patch("/api/users/:id", patchUserInformation)
+
+app.post("/api/properties/:id/favourite", postFavourite)
 
 app.all("*invalid-path", handlePathNotFound)
 
