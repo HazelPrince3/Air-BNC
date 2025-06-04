@@ -11,7 +11,7 @@ const users = `CREATE TABLE users (
                phone_number VARCHAR,
                is_host BOOLEAN NOT NULL, 
                avatar VARCHAR,
-               create_at TIMESTAMP DEFAULT NOW());`
+               created_at TIMESTAMP DEFAULT NOW());`
 
 const properties = `CREATE TABLE properties (
                     property_id SERIAL PRIMARY KEY,
