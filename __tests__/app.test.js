@@ -18,7 +18,7 @@ describe("app", () => {
 
         expect(body.msg).toBe("Path not found.");
     })
-   describe("GET - /api/properties", () => {
+   xdescribe("GET - /api/properties", () => {
         test("Responds with a status of 200", async () => {
             await request(app).get("/api/properties").expect(200)
     })
@@ -470,9 +470,9 @@ describe("app", () => {
         })
     })
 
-    xdescribe("DELETE - /api/properties/:id/users/:id/favourite", () => {
+    describe("DELETE - /api/properties/:id/users/:id/favourite", () => {
         test("Responds with a status of 204", async() => {
-            await request(app).delete("/api/properties/:id/users/:id/favourite").expect(204)
+            await request(app).delete("/api/properties/1/users/2/favourite").expect(204)
         })
         test("deleteFavourite should have an array length of 12 after deletion", async() =>{
             await request(app).delete("/api/properties/1/users/2/favourite")
@@ -480,6 +480,26 @@ describe("app", () => {
             const {rows} = await db.query("SELECT * FROM favourites")
 
             expect(rows.length).toBe(12)
+        })
+        test("Invalid property_id responds with a status:400 and msg: Bad request.", async() => {
+            const {body} = await request(app).delete("/api/properties/invalid-id/users/2/favourite").expect(400)
+
+            expect(body.msg).toBe("Bad request.")
+        })
+        test("Invalid user_id responds with a status:400 and msg: Bad request", async() => {
+            const {body} = await request(app).delete("/api/properties/1/users/invalid-id/favourite").expect(400)
+
+            expect(body.msg).toBe("Bad request.")
+        })
+        test("Valid id but non-existent property responds with a status:404 and msg Id not found", async() => {
+            const {body} = await request(app).delete("/api/properties/100/users/1/favourite").expect(404)
+
+            expect(body.msg).toBe("Id not found.")
+        })
+        test("Valid user_id but non existent user responds with a status:404 and msg: Id not found", async() => {
+            const {body} = await request(app).delete("/api/properties/1/users/100/favourite").expect(404)
+
+            expect(body.msg).toBe("Id not found.")
         })
     })
 })

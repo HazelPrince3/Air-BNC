@@ -20,3 +20,11 @@ exports.insertFavourite = async(id, guest_id) => {
     }
 
 }
+
+exports.deletePropertyFavourite = async(id, user_id) => {
+    const {rowCount} = await db.query("DELETE FROM favourites WHERE property_id = $1 AND guest_id = $2", [id, user_id])
+
+    if(rowCount === 0){
+        return Promise.reject({status:404, msg:"Id not found."})
+    }
+}
