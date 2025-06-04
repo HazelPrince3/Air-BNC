@@ -2,6 +2,7 @@ const express = require("express")
 const {getProperties, getSingleProperty} = require("./controllers/properties.controllers")
 const {getPropertyReviews, postPropertyReview, deletePropertyReview} = require("./controllers/reviews.controllers")
 const {getUserData, patchUserInformation} = require("./controllers/users.controllers")
+const {postFavourite} = require("./controllers/favourites.controllers")
 const {handlePathNotFound, handleCustomError, handleBadRequest, handleServerError} = require("./controllers/errors")
 const app = express()
 

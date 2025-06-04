@@ -418,7 +418,47 @@ describe("app", () => {
 
     describe("POST - /api/properties/:id/favourite", () => {
         test("Responds with a status of 201", async() => {
-            await request(app).post("/api/properties/:id/favourite").expect(201)
+            const data = {
+                guest_id: 2
+            }
+            const payload = JSON.stringify(data);
+
+            const {body} = await request(app).post("/api/properties/1/favourite").set('Content-Type', 'application/json').send(payload).expect(201)
+        })
+        test("Responds with an object with the keys msg and favourite_id", async() => {
+            const data = {
+                guest_id: 2
+            }
+            const payload = JSON.stringify(data);
+
+            const {body} = await request(app).post("/api/properties/1/favourite").set('Content-Type', 'application/json').send(payload)
+
+            expect(body.favourite.hasOwnProperty("msg")).toBe(true)
+            expect(body.favourite.msg).toBe("Property favourited successfully.")
+            expect(body.favourite.hasOwnProperty("favourite_id")).toBe(true)
+            expect(body.favourite.favourite_id).toBe(14)
+
+        })
+        test("Invalid property_id responds with a status:400 and msg Bad request", async() => {
+            const data = {
+                guest_id: 2
+            }
+            const payload = JSON.stringify(data);
+
+            const {body} = await request(app).post("/api/properties/invalid-id/favourite").set('Content-Type', 'application/json').send(payload).expect(400)
+
+            expect(body.msg).toBe("Bad request.")
+
+        })
+        test("Valid property_id but non-existent responds with a status:404 and msg Property not found", async() => {
+            const data = {
+                guest_id: 2
+            }
+            const payload = JSON.stringify(data);
+
+            const {body} = await request(app).post("/api/properties/100/favourite").set('Content-Type', 'application/json').send(payload).expect(404)
+
+            expect(body.msg).toBe("Property not found.")
         })
     })
 })
