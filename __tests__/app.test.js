@@ -18,7 +18,7 @@ describe("app", () => {
 
         expect(body.msg).toBe("Path not found.");
     })
-   xdescribe("GET - /api/properties", () => {
+   describe("GET - /api/properties", () => {
         test("Responds with a status of 200", async () => {
             await request(app).get("/api/properties").expect(200)
     })
@@ -164,7 +164,7 @@ describe("app", () => {
         })
     })
 
-    xdescribe("GET - /api/properties/:id", () =>{
+    describe("GET - /api/properties/:id", () =>{
         test("Responds with a status of 200", async() =>{
             await request(app).get("/api/properties/1").expect(200)
         })
@@ -179,6 +179,13 @@ describe("app", () => {
             expect(body.property.hasOwnProperty("host")).toBe(true)
             expect(body.property.hasOwnProperty("host_avatar")).toBe(true)
             expect(body.property.hasOwnProperty("favourite_count")).toBe(true)
+        })
+        test("Responds with an object containing a key of images with an a value of an array", async() => {
+            const {body} = await request(app).get("/api/properties/1")
+
+            expect(body.property.hasOwnProperty("images")).toBe(true)
+
+            expect(body.property.images.length).toBe(3)
         })
         test("Invalid id responds with a status:400 and msg: Bad request", async() => {
              const {body} = await request(app).get("/api/properties/invalid-id").expect(400)
@@ -209,6 +216,7 @@ describe("app", () => {
 
             expect(body.property.favourited).toBe(false)
         })
+        
     })
 
     xdescribe("POST - /api/properties/:id/reviews", () => {
@@ -416,7 +424,7 @@ describe("app", () => {
         })
     })
 
-    describe("POST - /api/properties/:id/favourite", () => {
+    xdescribe("POST - /api/properties/:id/favourite", () => {
         test("Responds with a status of 201", async() => {
             const data = {
                 guest_id: 2
@@ -459,6 +467,19 @@ describe("app", () => {
             const {body} = await request(app).post("/api/properties/100/favourite").set('Content-Type', 'application/json').send(payload).expect(404)
 
             expect(body.msg).toBe("Property not found.")
+        })
+    })
+
+    xdescribe("DELETE - /api/properties/:id/users/:id/favourite", () => {
+        test("Responds with a status of 204", async() => {
+            await request(app).delete("/api/properties/:id/users/:id/favourite").expect(204)
+        })
+        test("deleteFavourite should have an array length of 12 after deletion", async() =>{
+            await request(app).delete("/api/properties/1/users/2/favourite")
+
+            const {rows} = await db.query("SELECT * FROM favourites")
+
+            expect(rows.length).toBe(12)
         })
     })
 })

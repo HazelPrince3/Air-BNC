@@ -10,6 +10,15 @@ exports.selectProperties = async(maxprice, minprice, sort, order, host) => {
     if(validOrders.includes(order) === false){
         return Promise.reject({status: 400, msg: "Bad request."})
     }
+    if(isNaN(maxprice) && maxprice !== undefined){
+        return Promise.reject({status: 400, msg: "Bad request."})
+    }
+    if(isNaN(minprice) && minprice !== undefined){
+        return Promise.reject({status: 400, msg: "Bad request."})
+    }
+    if(isNaN(host) && host !== undefined){
+        return Promise.reject({status: 400, msg: "Bad request."})
+    }
     let queryValues = []
 
     let queryStr = `SELECT properties.property_id, host_id, name, location, price_per_night, first_name, surname, COUNT(favourites.property_id)
@@ -30,9 +39,7 @@ exports.selectProperties = async(maxprice, minprice, sort, order, host) => {
         queryValues.push(maxprice)
         queryStr += ` WHERE price_per_night <= $1`
     }
-    if(isNaN(maxprice) && maxprice !== undefined){
-        return Promise.reject({status: 400, msg: "Bad request."})
-    }
+    
     if(minprice > 0 && minprice < 100000000000){
         if(queryValues.length){
             queryStr += ` AND`
@@ -40,9 +47,7 @@ exports.selectProperties = async(maxprice, minprice, sort, order, host) => {
         queryValues.push(minprice)
         queryStr += ` price_per_night >= $${queryValues.length}`
     }
-    if(isNaN(minprice) && minprice !== undefined){
-        return Promise.reject({status: 400, msg: "Bad request."})
-    }
+    
     
     if(host > 0 && host < 100000000000000){
         if(queryValues.length){
@@ -51,9 +56,7 @@ exports.selectProperties = async(maxprice, minprice, sort, order, host) => {
         queryValues.push(host)
         queryStr += ` host_id = $${queryValues.length}`
     }
-    if(isNaN(host) && host !== undefined){
-        return Promise.reject({status: 400, msg: "Bad request."})
-    }
+    
     
     let groupBy = ` GROUP BY properties.property_id, name, location, price_per_night, first_name, surname, host_id`
 
@@ -107,7 +110,14 @@ exports.selectSingleProperty = async(id, user_id) => {
 
     const {rows : [property]} = await db.query(queryStr, [id])
 
-    
+    if(property === undefined){
+        return Promise.reject({status: 404, msg: "Property not found."})
+    }
+
+    const {rows: [images]} = await db.query("SELECT ARRAY(SELECT image_url FROM images WHERE property_id = $1)", [id])
+
+    property.images = images.array
+
     if(user_id){
         const {rows: favourited} = await db.query(`SELECT favourite_id
             FROM favourites
@@ -118,9 +128,7 @@ exports.selectSingleProperty = async(id, user_id) => {
         }else{property.favourited = false}
     }
     
-    if(property === undefined){
-        return Promise.reject({status: 404, msg: "Property not found."})
-    }
+    
     return property
 }
 
