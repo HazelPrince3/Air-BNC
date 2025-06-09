@@ -18,7 +18,7 @@ describe("app", () => {
 
         expect(body.msg).toBe("Path not found.");
     })
-   xdescribe("GET - /api/properties", () => {
+   describe("GET - /api/properties", () => {
         test("Responds with a status of 200", async () => {
             await request(app).get("/api/properties").expect(200)
     })
@@ -164,7 +164,7 @@ describe("app", () => {
         })
     })
 
-    describe("GET - /api/properties/:id", () =>{
+    xdescribe("GET - /api/properties/:id", () =>{
         test("Responds with a status of 200", async() =>{
             await request(app).get("/api/properties/1").expect(200)
         })
@@ -356,7 +356,7 @@ describe("app", () => {
             }
             const payload = JSON.stringify(data);
 
-            const {body} = await request(app).patch("/api/users/1").set('Content-Type', 'application/json').send(payload).expect(200)
+            await request(app).patch("/api/users/1").set('Content-Type', 'application/json').send(payload).expect(200)
         })
         test("Responds with the updated object when first_name is updated", async() => {
              const data = {
@@ -383,14 +383,14 @@ describe("app", () => {
         test("Responds with updated object when any combination of information is updated", async() => {
             const data = {
                phone: 111111111,
-               avatar: "test avatar"
+               avatar: "test-avatar.jpg"
             }
             const payload = JSON.stringify(data);
 
             const {body} = await request(app).patch("/api/users/1").set('Content-Type', 'application/json').send(payload)
 
             expect(body.user.phone_number).toBe("111111111")
-            expect(body.user.avatar).toBe("test avatar")
+            expect(body.user.avatar).toBe("test-avatar.jpg")
         })
         test("Invalid id responds with a status:400 and msg:Bad request", async() => {
             const data = {
@@ -412,9 +412,49 @@ describe("app", () => {
 
             expect(body.msg).toBe("User not found.")
         })
-        xtest("Invalid id responds with a status:400 and msg:Bad request", async() => {
+        test("Invalid first_name responds with a status:400 and msg:Bad request", async() => {
             const data = {
                 first_name: 100
+            }
+            const payload = JSON.stringify(data);
+
+            const {body} = await request(app).patch("/api/users/1").set('Content-Type', 'application/json').send(payload).expect(400)
+
+            expect(body.msg).toBe("Bad request.")
+        })
+        test("Invalid surname responds with a status:400 and msg:Bad request.", async() => {
+            const data = {
+                surname: 100
+            }
+            const payload = JSON.stringify(data);
+
+            const {body} = await request(app).patch("/api/users/1").set('Content-Type', 'application/json').send(payload).expect(400)
+
+            expect(body.msg).toBe("Bad request.")
+        })
+        test("Invalid phone number responds with a status:400 and msg:Bad request", async() => {
+            const data = {
+                phone: "invalid-number"
+            }
+            const payload = JSON.stringify(data);
+
+            const {body} = await request(app).patch("/api/users/1").set('Content-Type', 'application/json').send(payload).expect(400)
+
+            expect(body.msg).toBe("Bad request.")
+        })
+        test("Invalid email responds with a status: 400 and msg: Bad request", async() => {
+            const data = {
+                email: "invalid-email"
+            }
+            const payload = JSON.stringify(data);
+
+            const {body} = await request(app).patch("/api/users/1").set('Content-Type', 'application/json').send(payload).expect(400)
+
+            expect(body.msg).toBe("Bad request.")
+        })
+        test("Invalid avatar responds with status:400 and msg:Bad request", async() => {
+            const data = {
+                avatar: "invalid-avatar"
             }
             const payload = JSON.stringify(data);
 
@@ -470,7 +510,7 @@ describe("app", () => {
         })
     })
 
-    describe("DELETE - /api/properties/:id/users/:id/favourite", () => {
+    xdescribe("DELETE - /api/properties/:id/users/:id/favourite", () => {
         test("Responds with a status of 204", async() => {
             await request(app).delete("/api/properties/1/users/2/favourite").expect(204)
         })

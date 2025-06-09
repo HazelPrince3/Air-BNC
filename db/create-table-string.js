@@ -5,12 +5,12 @@ const propertyTypes = `CREATE TABLE property_types(
 
 const users = `CREATE TABLE users (
                user_id SERIAL PRIMARY KEY,
-               first_name VARCHAR NOT NULL,
-               surname VARCHAR NOT NULL,
-               email VARCHAR NOT NULL,
-               phone_number VARCHAR,
+               first_name VARCHAR NOT NULL CHECK(first_name ~ '^[^0-9]*$'),
+               surname VARCHAR NOT NULL CHECK(surname ~ '^[^0-9]*$'),
+               email VARCHAR NOT NULL CHECK(email ~ '@+'),
+               phone_number VARCHAR CHECK(phone_number ~ '^[0-9 +]*$'),
                is_host BOOLEAN NOT NULL, 
-               avatar VARCHAR,
+               avatar VARCHAR CHECK(avatar ~ '(.jpg)$'),
                created_at TIMESTAMP DEFAULT NOW());`
 
 const properties = `CREATE TABLE properties (

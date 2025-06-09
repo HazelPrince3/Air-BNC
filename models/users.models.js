@@ -54,13 +54,13 @@ exports.updateUserInformation = async(id, first_name, surname, email, phone, ava
                                   RETURNING *;`
 
     queryStr += condition
- 
-    const {rows: [updatedUser]} = await db.query(queryStr, queryValues)
+
     
+    const {rows: [updatedUser]} = await db.query(queryStr, queryValues)
     
     if(updatedUser === undefined){
         return Promise.reject({status:404, msg: "User not found."})
     }
-
     return updatedUser
+    
 }
