@@ -1,3 +1,4 @@
+
 const request = require("supertest")
 const app = require("../app")
 const {propertyTypesData, usersData, propertiesData, reviewsData, imagesData, favouritesData} = require("../db/data/test")
@@ -22,7 +23,7 @@ describe("app", () => {
         test("Responds with a status of 200", async () => {
             await request(app).get("/api/properties").expect(200)
     })
-        test("Responds with an array of objects containing property_id, property_name, location, price_per_night, host", async() =>{
+        test.only("Responds with an array of objects containing property_id, property_name, location, price_per_night, host, image", async() =>{
             const {body} = await request(app).get("/api/properties")
 
              expect(Array.isArray(body.properties)).toBe(true)
@@ -35,6 +36,7 @@ describe("app", () => {
             expect(property.hasOwnProperty("location")).toBe(true)
             expect(property.hasOwnProperty("price_per_night")).toBe(true) 
             expect(property.hasOwnProperty("host")).toBe(true)
+            expect(property.hasOwnProperty("image")).toBe(true)
         })
     })
         test("Array should have a length of 11", async() => {
@@ -184,6 +186,13 @@ describe("app", () => {
             const {body} = await request(app).get("/api/properties/1")
 
             expect(body.property.hasOwnProperty("images")).toBe(true)
+
+            expect(body.property.images.length).toBe(3)
+        })
+        test("Responds with an object containing a key of amenities with a value of an array", async() => {
+            const {body} = await request(app).get("/api/properties/1")
+
+            expect(body.property.hasOwnProperty("amenities")).toBe(true)
 
             expect(body.property.images.length).toBe(3)
         })

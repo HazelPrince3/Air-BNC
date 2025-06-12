@@ -2,12 +2,15 @@
   "name": "air-bnc",
   "version": "1.0.0",
   "description": "This repository mimics the functionality of the Air BnB website.  It will connect and insert data into a database using Node-Postgres.",
-  "main": "index.js",
+  "main": "listen.js",
   "scripts": {
     "test-utils": "jest utils",
     "test-app": "jest app",
-    "setup-db": "psql -f ./db/setup_db.sql",
-    "seed": "node ./db/seed-run.js"
+    "setup-dbs": "psql -f ./db/setup_db.sql",
+    "seed-dev": "node ./db/seed-run.js",
+    "seed-prod": "NODE_ENV=production node ./db/seed-run.js",
+    "dev": "nodemon listen.js", 
+    "start": "node listen.js"
   },
   "repository": {
     "type": "git",
