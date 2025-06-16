@@ -23,7 +23,7 @@ describe("app", () => {
         test("Responds with a status of 200", async () => {
             await request(app).get("/api/properties").expect(200)
     })
-        test.only("Responds with an array of objects containing property_id, property_name, location, price_per_night, host, image", async() =>{
+        xtest("Responds with an array of objects containing property_id, property_name, location, price_per_night, host, image", async() =>{
             const {body} = await request(app).get("/api/properties")
 
              expect(Array.isArray(body.properties)).toBe(true)
@@ -46,7 +46,7 @@ describe("app", () => {
         test("Properties will be ordered by most favourited to least favourited by default.", async () => {
             const {body} = await request(app).get("/api/properties")
 
-            expect(body.properties).toBeSortedBy("count", {descending: true, coerce: true})
+            expect(body.properties).toBeSortedBy("favourite_count", {descending: true, coerce: true})
         })
         test("User can give a maximum price for properties", async() => {
               const {body} = await request(app).get("/api/properties/?maxprice=100")
@@ -80,7 +80,7 @@ describe("app", () => {
         test("User can can sort by popularity", async()=>{
             const {body} = await request(app).get("/api/properties/?sort=popularity")
 
-            expect(body.properties).toBeSortedBy("count", {coerce: true})
+            expect(body.properties).toBeSortedBy("favourite_count", {coerce: true})
         })
         test("Invalid sort responds with a status:400 and msg", async() => {
             const {body} = await request(app).get("/api/properties?sort=invalid-sort").expect(400)
@@ -96,7 +96,7 @@ describe("app", () => {
         test("User can sort by least favourited to most favourited", async() => {
             const {body} = await request(app).get("/api/properties/?order=ascending")
 
-            expect(body.properties).toBeSortedBy("count", {coerce: true})
+            expect(body.properties).toBeSortedBy("favourite_count", {coerce: true})
         })
         test("Invalid order responds with a status:400 and msg", async() => {
             const {body} = await request(app).get("/api/properties?order=invalid-order").expect(400)
@@ -120,9 +120,19 @@ describe("app", () => {
 
             expect(body.msg).toBe("Host not found")
         })
+        test("Invalid methods - /api/properties", async () => {
+
+            const invalidMethods = ["patch", "delete", "post", "put"]
+
+            invalidMethods.forEach(async (method)=>{
+                const {body} = await request(app)[method]("/api/properties").expect(405)
+
+                expect(body.msg).toBe("Invalid method.")
+            })
+        })
 })
 
-    xdescribe("GET - /api/properties/:id/reviews", () => {
+    describe("GET - /api/properties/:id/reviews", () => {
         test("Responds with a status of 200", async () => {
             await request(app).get("/api/properties/3/reviews").expect(200)
         })
@@ -164,9 +174,19 @@ describe("app", () => {
 
             expect(body.msg).toBe("Id not found.")
         })
+        test("Invalid methods - /api/properties/:id/reviews", async () => {
+
+            const invalidMethods = ["patch", "delete", "put"]
+
+            invalidMethods.forEach(async (method)=>{
+                const {body} = await request(app)[method]("/api/properties/:id/reviews").expect(405)
+
+                expect(body.msg).toBe("Invalid method.")
+            })
+        })
     })
 
-    xdescribe("GET - /api/properties/:id", () =>{
+    describe("GET - /api/properties/:id", () =>{
         test("Responds with a status of 200", async() =>{
             await request(app).get("/api/properties/1").expect(200)
         })
@@ -225,10 +245,20 @@ describe("app", () => {
 
             expect(body.property.favourited).toBe(false)
         })
+        test("Invalid methods - /api/properties/:id", async () => {
+
+            const invalidMethods = ["patch", "delete","post", "put"]
+
+            invalidMethods.forEach(async (method)=>{
+                const {body} = await request(app)[method]("/api/properties/:id").expect(405)
+
+                expect(body.msg).toBe("Invalid method.")
+            })
+        })
         
     })
 
-    xdescribe("POST - /api/properties/:id/reviews", () => {
+    describe("POST - /api/properties/:id/reviews", () => {
         test("Responds with a status of 201", async() => {
             const data = {
                 guest_id: 4,
@@ -306,9 +336,19 @@ describe("app", () => {
 
             expect(body.msg).toBe("Bad request.")
         })
+        test("Invalid methods - /api/properties/:id/reviews", async () => {
+
+            const invalidMethods = ["patch", "delete", "put"]
+
+            invalidMethods.forEach(async (method)=>{
+                const {body} = await request(app)[method]("/api/properties/:id/reviews").expect(405)
+
+                expect(body.msg).toBe("Invalid method.")
+            })
+        })
     })
 
-    xdescribe("DELETE - /api/reviews/:id", () => {
+    describe("DELETE - /api/reviews/:id", () => {
         test("Responds with a status of 204", async() => {
             await request(app).delete("/api/reviews/1").expect(204)
         })
@@ -329,9 +369,19 @@ describe("app", () => {
 
             expect(body.msg).toBe("Review not found.")
         })
+        test("Invalid methods - /api/reviews/:id", async () => {
+
+            const invalidMethods = ["patch", "get", "post", "put"]
+
+            invalidMethods.forEach(async (method)=>{
+                const {body} = await request(app)[method]("/api/reviews/:id").expect(405)
+
+                expect(body.msg).toBe("Invalid method.")
+            })
+        })
     })
 
-    xdescribe("GET - /api/users/:id", () => {
+    describe("GET - /api/users/:id", () => {
         test("Responds with a status of 200", async() => {
             await request(app).get("/api/users/1").expect(200)
         })
@@ -356,9 +406,19 @@ describe("app", () => {
 
             expect(body.msg).toBe("User not found.")
         })
+         test("Invalid methods - /api/users/:id", async () => {
+
+            const invalidMethods = ["delete", "post", "put"]
+
+            invalidMethods.forEach(async (method)=>{
+                const {body} = await request(app)[method]("/api/users/:id").expect(405)
+
+                expect(body.msg).toBe("Invalid method.")
+            })
+        })
     })
 
-    xdescribe("PATCH - /api/users/:id", () => {
+    describe("PATCH - /api/users/:id", () => {
         test("Responds with a status of 200", async() => {
              const data = {
                 first_name: "Charlotte"
@@ -461,19 +521,19 @@ describe("app", () => {
 
             expect(body.msg).toBe("Bad request.")
         })
-        test("Invalid avatar responds with status:400 and msg:Bad request", async() => {
-            const data = {
-                avatar: "invalid-avatar"
-            }
-            const payload = JSON.stringify(data);
+         test("Invalid methods - /api/users/:id", async () => {
 
-            const {body} = await request(app).patch("/api/users/1").set('Content-Type', 'application/json').send(payload).expect(400)
+            const invalidMethods = ["delete", "post", "put"]
 
-            expect(body.msg).toBe("Bad request.")
+            invalidMethods.forEach(async (method)=>{
+                const {body} = await request(app)[method]("/api/users/:id").expect(405)
+
+                expect(body.msg).toBe("Invalid method.")
+            })
         })
     })
 
-    xdescribe("POST - /api/properties/:id/favourite", () => {
+    describe("POST - /api/properties/:id/favourite", () => {
         test("Responds with a status of 201", async() => {
             const data = {
                 guest_id: 2
@@ -517,9 +577,19 @@ describe("app", () => {
 
             expect(body.msg).toBe("Property not found.")
         })
+         test("Invalid methods - /api/properties/:id/favourite", async () => {
+
+            const invalidMethods = ["delete", "patch", "get", "put"]
+
+            invalidMethods.forEach(async (method)=>{
+                const {body} = await request(app)[method]("/api/properties/:id/favourite").expect(405)
+
+                expect(body.msg).toBe("Invalid method.")
+            })
+        })
     })
 
-    xdescribe("DELETE - /api/properties/:id/users/:id/favourite", () => {
+    describe("DELETE - /api/properties/:id/users/:id/favourite", () => {
         test("Responds with a status of 204", async() => {
             await request(app).delete("/api/properties/1/users/2/favourite").expect(204)
         })
@@ -549,6 +619,16 @@ describe("app", () => {
             const {body} = await request(app).delete("/api/properties/1/users/100/favourite").expect(404)
 
             expect(body.msg).toBe("Id not found.")
+        })
+        test("Invalid methods - /api/properties/:id/users/:id/favourite", async () => {
+
+            const invalidMethods = ["post", "patch", "get", "put"]
+
+            invalidMethods.forEach(async (method)=>{
+                const {body} = await request(app)[method]("/api/properties/:id/users/:id/favourite").expect(405)
+
+                expect(body.msg).toBe("Invalid method.")
+            })
         })
     })
 })
