@@ -1,0 +1,40 @@
+body {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    background-color:rgb(249, 243, 235);
+    line-height: 1.4;
+    font-size: 2vh;
+}
+main {
+    display:flex;
+    justify-content:space-evenly;
+    align-items: stretch;
+    flex-wrap: wrap;
+}
+
+h1 {
+    text-align:center;
+    font-size: 5vh;
+}
+
+h2 {
+    font-weight: 500;
+    font-size: 3vh;
+    border-bottom: 2px solid lightgray;
+    word-wrap: break-word;
+}
+
+.path {
+    color:teal;
+    font-weight: 300;
+}
+
+section {
+    border: 2px solid lightseagreen;
+    margin: 10px;
+    padding: 5px 20px 20px 20px;
+}
+
+.endpoint {
+    flex-grow: 1;
+    width: 25vw;
+}

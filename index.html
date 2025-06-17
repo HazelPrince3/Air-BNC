@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Air-BNC Endpoints</title>
+	<link rel="stylesheet" href="public/style.css">
+</head>
+<body>
+    <h1>Available Endpoints for Air-BNC</h1>
+    <main>
+        <section class="endpoint">
+            <h2>GET - <span class="path">/api/properties</span></h2>
+            <p>The above endpoint will retrieve all of the properties listed in the database, they will be ordered by most favourited to least favourited by default.</p>
+            <p>You can expect the properties to be an array of objects with each object containing the following properties:</p>
+            <ul>
+                <li>property_id</li>
+                <li>property_name</li>
+                <li>location</li>
+                <li>price_per_night</li>
+                <li>host</li>
+                <li>favourite_count</li>
+            </ul>
+            <p>There are also a number of optional queries which can be added to the endpoint, these are as follows:</p>
+            <ul>
+                <li>?maxprice=[max cost per night]</li>
+                <li>?minprice=[min cost per night]</li>
+                <li>?sort= cost_per_night | popularity></li>
+                <li>?order= ascending | descending></li>
+                <li>?host=[id]</li>
+            </ul>
+        </section>
+        <section class="endpoint">
+            <h2>GET- <span class="path">/api/properties/:id</span></h2>
+            <p>The above endpoint will retrieve information about a single property, you can expect the following information:</p>
+            <ul>
+                <li>property_id</li>
+                <li>property_name</li>
+                <li>location</li>
+                <li>price_per_night</li>
+                <li>description</li>
+                <li>host</li>
+                <li>host_avatar</li>
+                <li>favourite_count</li>
+                <li>images - an array of all images for that property</li>
+                <li>amenities - an array of all the amenities for that property</li>
+            </ul>
+            <p>There is an optional query which will updated the object to indicate whether the given user has favourited the property or not:</p>
+            <ul>
+							<li>?user_id=[id]</li>
+						</ul>
+        </section>
+        <section class="endpoint">
+            <h2>GET - <span class="path">/api/properties/:id/reviews<span></h2>
+            <p>The above endpoint will retrieve all of the reviews for a single given property.  The reviews will be ordered by most recent by defualt</p>
+            <p>You can expect the reviews to be an array of objects with each object containing the following properties:</p>
+            <ul>
+                <li>review_id</li>
+                <li>comment</li>
+                <li>rating</li>
+                <li>created_at</li>
+                <li>guest</li>
+                <li>guest_avatar</li>
+            </ul>
+            <p>After the array there will be an average rating of all of the review ratings for the specific property.</p>
+        </section>
+        <section class="endpoint">
+            <h2>POST- <span class="path">/api/properties/:id/reviews</span></h2>
+            <p>The above endpoint should insert a new row into the database.  The following payload should be given as an object:</p>
+            <ul>
+                <li>guest_id</li>
+                <li>rating</li>
+                <li>comment</li>
+            </ul>
+            <p>Following a successful POST, you should recieve a 201 status with an object with the following properties:</p>
+            <ul>
+                <li>review_id</li>
+                <li>property_id</li>
+                <li>guest_id</li>
+                <li>rating</li>
+                <li>comment</li>
+                <li>created_at</li>
+            </ul>
+        </section>
+        <section class="endpoint">
+            <h2>DELETE - <span class="path">/api/reviews/:id<span></h2>
+            <p>The above endpoint should remove the row from the reviews table with the given id.  Following a successful DELETE it should respond with a status of 204 with other information given.</p>
+        </section>
+        <section class="endpoint">
+            <h2>GET - <span class="path">/api/users/:id</span></h2>
+            <p>The above endpoint should retrieve information on a user with the given id.  The user response should be an object with the following information.</p>
+            <ul>
+                <li>user_id</li>
+                <li>first_name</li>
+                <li>surname</li>
+                <li>email</li>
+                <li>phone_number</li>
+                <li>avatar</li>
+                <li>created_at</li>
+            </ul>
+        </section>
+        <section class="endpoint">
+            <h2>PATCH - <span class="path">/api/users/:id</span></h2>
+            <p>The above endpoint should update a given users information with the information provided in the payload.  The expected payload can be any combination of the following properties:</p>
+            <ul>
+                <li>first_name</li>
+                <li>surname</li>
+                <li>email</li>
+                <li>phone_number</li>
+                <li>avatar</li>
+            </ul>
+            <p>A successful PATCH should respond with a status sof 200 and an object containing all properties from the row.</p>
+        </section>
+        <section class="endpoint">
+            <h2>POST - <span class="path">/api/properties/:id/favourite</span></h2>
+            <p>The above endpoint should insert a new row into the favourites table for the given property.  The following payload is expected:</p>
+            <ul>
+                <li>guest_id</li>
+            </ul>
+            <p>Following a successful request, it should respond with an object with the following:</p>
+            <ul>
+                <li>msg:"Property favourited successfully"</li>
+                <li>favourite_id</li>
+            </ul>
+        </section>
+        <section class="endpoint">
+            <h2>DELETE - <span class="path">/api/properties/:id/users/:id/favourite</span></h2>
+            <p>The above endpoint should remove the row in the favourite table which matches the property and the user id.  A successful DELETE should return with a 204 status.</p>
+        </section>
+    </main>
+</body>
+</html>
