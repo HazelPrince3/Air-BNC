@@ -23,7 +23,7 @@ describe("app", () => {
         test("Responds with a status of 200", async () => {
             await request(app).get("/api/properties").expect(200)
     })
-        xtest("Responds with an array of objects containing property_id, property_name, location, price_per_night, host, image", async() =>{
+        test("Responds with an array of objects containing property_id, property_name, location, price_per_night, host, image", async() =>{
             const {body} = await request(app).get("/api/properties")
 
              expect(Array.isArray(body.properties)).toBe(true)
@@ -129,6 +129,8 @@ describe("app", () => {
 
                 expect(body.msg).toBe("Invalid method.")
             })
+        })
+        
         })
 })
 
