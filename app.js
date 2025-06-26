@@ -1,14 +1,17 @@
 const express = require("express")
 const apiRouter = require("./routes/api.router")
 const {handlePathNotFound, handleCustomError, handleBadRequest, handleServerError} = require("./controllers/errors")
+const cors = require('cors')
 const app = express()
+
+app.use(cors())
 
 app.use(express.json())
 
 app.use(express.static('./public'))
 
 app.get("/", (req, res, next) => {
-    res.sendFile("./index.html")
+    res.sendFile(`${__dirname}/index.html`)
 })
 
 app.use("/api", apiRouter)
