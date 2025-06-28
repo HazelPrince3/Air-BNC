@@ -35,10 +35,11 @@ exports.selectProperties = async(maxprice, minprice, sort, order, host) => {
                     
 
     if(sort === "price_per_night"){
-        queryStr = `SELECT properties.property_id, host_id, name AS property_name, location, price_per_night, CONCAT(first_name, ' ', surname) host
+        queryStr = `SELECT properties.property_id, host_id, name AS property_name, location, price_per_night, CONCAT(first_name, ' ', surname) host, image
                     FROM properties 
                     JOIN users
-                    ON users.user_id = properties.host_id`
+                    ON users.user_id = properties.host_id
+                    LEFT JOIN LATERAL(SELECT DISTINCT ON (property_id) property_id, image_url AS image FROM images) i ON properties.property_id = i.property_id`
     }
 
     if(maxprice){
@@ -84,8 +85,6 @@ exports.selectProperties = async(maxprice, minprice, sort, order, host) => {
     if(rows.length === 0){
         return Promise.reject({status: 404, msg: "Host not found"})
     }
-
-    console.log(rows)
 
     return rows;
 
